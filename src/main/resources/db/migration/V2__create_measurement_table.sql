@@ -1,4 +1,5 @@
 CREATE TABLE measurement (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     diameter_side DOUBLE,
     diameter_cross DOUBLE,
     proportion_n DOUBLE,

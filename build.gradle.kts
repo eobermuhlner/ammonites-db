@@ -64,7 +64,6 @@ jooq {
                     }
                     generate.apply {
                         isPojos = true
-                        isImmutablePojos = true
                     }
                 }
             }

@@ -7,7 +7,6 @@ import ch.obermuhlner.ammonites.jooq.tables.pojos.Measurement
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Result
-import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
 import java.util.*
 
@@ -20,6 +19,10 @@ class AmmoniteRepository(private val dsl: DSLContext) {
 
     fun findById(id: Int): Optional<Ammonite> {
         return dsl.selectFrom(AMMONITE).where(AMMONITE.ID.eq(id)).fetchOptionalInto(Ammonite::class.java)
+    }
+
+    fun existsById(id: Int): Boolean {
+        return dsl.fetchExists(dsl.selectFrom(AMMONITE).where(AMMONITE.ID.eq(id)))
     }
 
     fun save(ammonite: Ammonite): Ammonite {
@@ -44,22 +47,28 @@ class AmmoniteRepository(private val dsl: DSLContext) {
         }
     }
 
-    fun deleteById(id: Int) {
-        dsl.deleteFrom(AMMONITE).where(AMMONITE.ID.eq(id)).execute()
+    fun deleteById(id: Int): Boolean {
+        return dsl.deleteFrom(AMMONITE).where(AMMONITE.ID.eq(id)).execute() == 1
     }
 
-    data class AmmoniteWithMeasurements (val ammonite: Ammonite, val measurement: Measurement)
+//    data class AmmoniteWithMeasurements (val ammonite: Ammonite, val measurement: Measurement)
+//    fun findAllWithMeasurements(): List<AmmoniteWithMeasurements> {
+//        return dsl.select()
+//            .from(AMMONITE)
+//            .join(Tables.MEASUREMENT).on(AMMONITE.ID.eq(Tables.MEASUREMENT.AMMONITE_ID))
+//            .fetch()
+//            .map { record ->
+//                val ammonite = record.into(Ammonite::class.java)
+//                val measurement = record.into(Measurement::class.java)
+//                AmmoniteWithMeasurements(ammonite, measurement)
+//            }
+//    }
 
-    fun findAllWithMeasurements(): List<AmmoniteWithMeasurements> {
+    fun findMatchingAmmonitesWithMeasurements(): Result<Record> {
         return dsl.select()
             .from(AMMONITE)
             .join(Tables.MEASUREMENT).on(AMMONITE.ID.eq(Tables.MEASUREMENT.AMMONITE_ID))
             .fetch()
-            .map { record ->
-                val ammonite = record.into(Ammonite::class.java)
-                val measurement = record.into(Measurement::class.java)
-                AmmoniteWithMeasurements(ammonite, measurement)
-            }
     }
 
 }

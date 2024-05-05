@@ -1,70 +1,45 @@
 package ch.obermuhlner.ammonites.ammonite
 
 import ch.obermuhlner.ammonites.jooq.Tables
-import ch.obermuhlner.ammonites.jooq.Tables.AMMONITE
-import ch.obermuhlner.ammonites.jooq.Tables.MEASUREMENT
-import ch.obermuhlner.ammonites.jooq.tables.records.AmmoniteRecord
-import org.jooq.DSLContext
+import ch.obermuhlner.ammonites.jooq.tables.pojos.Ammonite
+import ch.obermuhlner.ammonites.jooq.tables.pojos.Measurement
 import org.jooq.Record
-import org.jooq.Result
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class AmmoniteService(private val dsl: DSLContext) {
-    fun fetchAllAmmonites(): Result<AmmoniteRecord> {
-        return dsl.selectFrom(AMMONITE).fetch()
+class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
+
+    fun create(ammonite: Ammonite): Ammonite {
+        if (ammonite.id != null) {
+            throw IllegalArgumentException("Not allowed to create with explicit id")
+        }
+        return ammoniteRepository.save(ammonite)
     }
 
-    fun fetchAllAmmonitesWithMeasurements(): Result<Record> {
-        return dsl.select()
-            .from(AMMONITE)
-            .join(MEASUREMENT).on(AMMONITE.ID.eq(MEASUREMENT.AMMONITE_ID))
-            .fetch()
+    fun findAll(): List<Ammonite> {
+        return ammoniteRepository.findAll()
     }
 
-    fun fetchMatchingAmmonites(
-        diameterSide: Double? = null,
-        diameterCross: Double? = null,
-        proportion_n: Double? = null,
-        proportion_h: Double? = null,
-        proportion_b: Double? = null,
-        proportion_q: Double? = null,
-        count_z: Double? = null,
-        factor: Double = 1.5
-    ): Result<Record> {
-        var query = dsl.select()
-            .from(AMMONITE)
-            .join(MEASUREMENT).on(AMMONITE.ID.eq(MEASUREMENT.AMMONITE_ID))
-            .where()
-
-        if (diameterSide != null) {
-            query = query.and(MEASUREMENT.DIAMETER_SIDE.between(diameterSide/factor, diameterSide*factor))
-        }
-        if (diameterCross != null) {
-            query = query.and(MEASUREMENT.DIAMETER_CROSS.isNull.or(MEASUREMENT.DIAMETER_CROSS.between(diameterCross/factor, diameterCross*factor)))
-        }
-        if (proportion_n != null) {
-            query = query.and(MEASUREMENT.PROPORTION_N.isNull.or(MEASUREMENT.PROPORTION_N.between(proportion_n/factor, proportion_n*factor)))
-        }
-        if (proportion_h != null) {
-            query = query.and(MEASUREMENT.PROPORTION_H.isNull.or(MEASUREMENT.PROPORTION_H.between(proportion_h/factor, proportion_h*factor)))
-        }
-        if (proportion_b != null) {
-            query = query.and(MEASUREMENT.PROPORTION_B.isNull.or(MEASUREMENT.PROPORTION_B.between(proportion_b/factor, proportion_b*factor)))
-        }
-        if (proportion_q != null) {
-            query = query.and(MEASUREMENT.PROPORTION_Q.isNull.or(MEASUREMENT.PROPORTION_Q.between(proportion_q/factor, proportion_q*factor)))
-        }
-        if (count_z != null) {
-            query = query.and(MEASUREMENT.COUNT_Z.isNull.or(MEASUREMENT.COUNT_Z.between((count_z/factor), (count_z*factor))))
-        }
-
-        return query.fetch()
+    fun findById(id: Int): Ammonite? {
+        return ammoniteRepository.findById(id).orElse(null)
     }
 
-    fun searchMatchingAmmonites(
-        ammoniteService: AmmoniteService,
+    fun updateById(id: Int, updatedAmmonite: Ammonite): Ammonite? {
+        if (ammoniteRepository.existsById(id)) {
+            updatedAmmonite.id = id
+            return ammoniteRepository.save(updatedAmmonite)
+        }
+        return null
+    }
+
+    fun deleteById(id: Int): Boolean {
+        return ammoniteRepository.deleteById(id)
+    }
+
+    data class AmmoniteWithMeasurement(val ammonite: Ammonite, val measurement: Measurement)
+
+    fun findMatchingAmmonitesWithMeasurements(
         diameterSide: Double? = null,
         diameterCross: Double? = null,
         proportion_n: Double? = null,
@@ -73,12 +48,20 @@ class AmmoniteService(private val dsl: DSLContext) {
         proportion_q: Double? = null,
         count_z: Double? = null,
         limit: Int = 5
-    ): Map<Double, Record> {
-        val records = ammoniteService.fetchAllAmmonitesWithMeasurements()
+    ): Map<Double, AmmoniteWithMeasurement> {
+        val records = ammoniteRepository.findMatchingAmmonitesWithMeasurements()
         return records
-            .map { record -> Pair(sumOfRelativeSquareErrors(record!!, diameterSide, diameterCross, proportion_n, proportion_h, proportion_b, proportion_q, count_z), record) }
+            .map { record ->
+                Pair(sumOfRelativeSquareErrors(record!!, diameterSide, diameterCross, proportion_n, proportion_h, proportion_b, proportion_q, count_z), record)
+            }
             .sortedBy { pair -> pair.first }
             .take(limit)
+            .map { pair ->
+                val record = pair.second
+                val ammonite = record.into(Ammonite::class.java)
+                val measurement = record.into(Measurement::class.java)
+                Pair(pair.first, AmmoniteWithMeasurement(ammonite, measurement))
+            }
             .toMap(TreeMap())
     }
 
