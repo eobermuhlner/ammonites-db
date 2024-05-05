@@ -1,9 +1,9 @@
-INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, strata)
+INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, comment, strata)
 VALUES
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes gresslei', '', 'ox 1 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes sorlinensis', '', 'ox 1 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes neglectus', '', 'ox 1 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes thurmanni', '', 'ox 1 b');
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes gresslei', '', 'Schlegelmilch, Malm, Image: 17.3', 'ox 1 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes sorlinensis', '', 'Schlegelmilch, Malm, Image: 17.4', 'ox 1 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes neglectus', '', 'Schlegelmilch, Malm, Image: 17.5', 'ox 1 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes thurmanni', '', 'Schlegelmilch, Malm, Image: 17.6', 'ox 1 b');
 
 INSERT INTO measurement (diameter_side, diameter_cross, proportion_n, proportion_h, proportion_b, proportion_q, count_z, comment, ammonite_id)
 SELECT 4.7, null, 45, 32, null, 0.8, 50, 'Schlegelmilch', a.id

@@ -1,12 +1,12 @@
-INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, strata)
+INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, comment, strata)
 VALUES
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) polygyratus', '', 'ox 1 f?, ox 2 a, ox 2 b, ki 1 a'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) laufensis', '', 'ox 1 f, ox 2 a, ox 2 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) virgulatus', '', 'ox 2 a, ox 2 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) wemodingensis', '', 'ox 2 a, ox 2 b, ki 1 a'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) tizianiformis', '', 'ox 1 f, ox 2 a, ox 2 b, ki 1 a'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) freybergi', '', 'ox 2 b, ki 1 a'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) suevicus', '', 'ox 2 a, ox 2 b');
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) polygyratus', '', 'Schlegelmilch, Malm, Image: 21.9', 'ox 1 f?, ox 2 a, ox 2 b, ki 1 a'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) laufensis', '', 'Schlegelmilch, Malm, Image: 22.1', 'ox 1 f, ox 2 a, ox 2 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) virgulatus', '', 'Schlegelmilch, Malm, Image: 22.2', 'ox 2 a, ox 2 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) wemodingensis', '', 'Schlegelmilch, Malm, Image: 22.3', 'ox 2 a, ox 2 b, ki 1 a'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) tizianiformis', '', 'Schlegelmilch, Malm, Image: 22.4', 'ox 1 f, ox 2 a, ox 2 b, ki 1 a'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) freybergi', '', 'Schlegelmilch, Malm, Image: 22.5', 'ox 2 b, ki 1 a'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Orthosphinctes', 'Orthosphinctes (O.) suevicus', '', 'Schlegelmilch, Malm, Image: 23.1', 'ox 2 a, ox 2 b');
 
 INSERT INTO measurement (diameter_side, diameter_cross, proportion_n, proportion_h, proportion_b, proportion_q, count_z, comment, ammonite_id)
 SELECT 10.7, null, 50, 31, null, null, 140, 'Schlegelmilch', a.id

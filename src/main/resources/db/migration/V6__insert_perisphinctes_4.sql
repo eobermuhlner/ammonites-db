@@ -1,9 +1,9 @@
-INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, strata)
+INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, comment, strata)
 VALUES
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Kranaosphinctes', 'Perisphinctes (K.) plicatilis', '', 'ox 1 c'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Kranaosphinctes', 'Perisphinctes (K.) elisabethae', '', 'ox 1 c'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Kranaosphinctes', 'Perisphinctes (K.) gigantoplex', '', 'ox 1 f?'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Kranaosphinctes', 'Perisphinctes (K.) berlieri', '', 'ox 1 f, ox 2 a');
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Kranaosphinctes', 'Perisphinctes (K.) plicatilis', '', 'Schlegelmilch, Malm, Image: 18.2', 'ox 1 c'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Kranaosphinctes', 'Perisphinctes (K.) elisabethae', '', 'Schlegelmilch, Malm, Image: 18.3', 'ox 1 c'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Kranaosphinctes', 'Perisphinctes (K.) gigantoplex', '', 'Schlegelmilch, Malm, Image: 18.4', 'ox 1 f?'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Kranaosphinctes', 'Perisphinctes (K.) berlieri', '', 'Schlegelmilch, Malm, Image: 19.1', 'ox 1 f, ox 2 a');
 
 INSERT INTO measurement (diameter_side, diameter_cross, proportion_n, proportion_h, proportion_b, proportion_q, count_z, comment, ammonite_id)
 SELECT 10, null, 41, 34, null, 1.21, 68, 'Schlegelmilch', a.id

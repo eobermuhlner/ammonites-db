@@ -1,7 +1,7 @@
-INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, strata)
+INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, comment, strata)
 VALUES
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Neomorphoceras', 'Neomorphoceras chapuisi', '', 'ox 1 c'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Neomorphoceras', 'Neomorphoceras colinii', '', 'ox 1 c');
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Neomorphoceras', 'Neomorphoceras chapuisi', '', 'Schlegelmilch, Malm, Image: 21.4', 'ox 1 c'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Neomorphoceras', 'Neomorphoceras colinii', '', 'Schlegelmilch, Malm, Image: 21.10', 'ox 1 c');
 
 INSERT INTO measurement (diameter_side, diameter_cross, proportion_n, proportion_h, proportion_b, proportion_q, count_z, comment, ammonite_id)
 SELECT 1.3, null, 44, 29, null, 0.6, null, 'Schlegelmilch', a.id

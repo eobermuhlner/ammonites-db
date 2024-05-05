@@ -1,9 +1,9 @@
-INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, strata)
+INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, comment, strata)
 VALUES
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Alligaticeras', 'Alligaticeras consociatum', '', 'ox 1 a, ox 1 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Alligaticeras', 'Alligaticeras mairei', '', 'ox 1 a, ox 1 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes bernensis', '', 'ox 1 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes hermonis', '', 'ox 1 b');
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Alligaticeras', 'Alligaticeras consociatum', '', 'Schlegelmilch, Malm, Image: 16.23', 'ox 1 a, ox 1 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Alligaticeras', 'Alligaticeras mairei', '', 'Schlegelmilch, Malm, Image: 17.1', 'ox 1 a, ox 1 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes bernensis', '', 'Schlegelmilch, Malm, Image: 17.2', 'ox 1 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Properisphinctes', 'Properisphinctes hermonis', '', 'Schlegelmilch, Malm', 'ox 1 b');
 
 INSERT INTO measurement (diameter_side, diameter_cross, proportion_n, proportion_h, proportion_b, proportion_q, count_z, comment, ammonite_id)
 SELECT 10.8, null, 44, 31, null, 1.07, 57, 'Schlegelmilch', a.id

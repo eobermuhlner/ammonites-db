@@ -1,10 +1,10 @@
-INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, strata)
+INSERT INTO ammonite (taxonomy_subclass, taxonomy_family, taxonomy_subfamily, taxonomy_genus, taxonomy_subgenus, taxonomy_species, description, comment, strata)
 VALUES
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) bouranensis', '', 'ox 1 b'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) montfalconensis', '', 'ox 1 c'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) wartae', '', 'ox 1 b, ox 1 c'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) antecedens', '', 'ox 1 c, ox 1 d'),
-('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) vermicularis', '', 'ox 1 c');
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) bouranensis', '', 'Schlegelmilch, Malm, Image: 17.7', 'ox 1 b'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) montfalconensis', '', 'Schlegelmilch, Malm, Image: 17.8', 'ox 1 c'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) wartae', '', 'Schlegelmilch, Malm, Image: 17.8', 'ox 1 b, ox 1 c'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) antecedens', '', 'Schlegelmilch, Malm, Image: 18.1', 'ox 1 c, ox 1 d'),
+('Perisphinctaceae', 'Perisphinctidae', 'Perisphinctinae', 'Perisphinctes', 'Dichotomosphinctes', 'Perisphinctes (D.) vermicularis', '', 'Schlegelmilch, Malm, Image: 17.10', 'ox 1 c');
 
 INSERT INTO measurement (diameter_side, diameter_cross, proportion_n, proportion_h, proportion_b, proportion_q, count_z, comment, ammonite_id)
 SELECT 9, null, 47, 33, null, 1.65, 70, 'Schlegelmilch', a.id
