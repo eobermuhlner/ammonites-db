@@ -7,6 +7,7 @@ CREATE TABLE ammonite (
     taxonomy_subgenus VARCHAR(255),
     taxonomy_species VARCHAR(255),
     strata TEXT,
-    description TEXT
+    description TEXT,
+    comment TEXT
 );
 
