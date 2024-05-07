@@ -1,7 +1,6 @@
 package ch.obermuhlner.ammonites.ammonite
 
 import ch.obermuhlner.ammonites.jooq.tables.pojos.Ammonite
-import org.jooq.Record
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -65,7 +64,7 @@ class AmmoniteRestController @Autowired constructor(
         @RequestParam(required = false) proportionB: Double? = null,
         @RequestParam(required = false) proportionQ: Double? = null,
         @RequestParam(required = false) countZ: Double? = null,
-        @RequestParam(defaultValue = "5") limit: Int): Map<Double, AmmoniteService.AmmoniteWithMeasurement> {
+        @RequestParam(defaultValue = "5") limit: Int): List<AmmoniteService.AmmoniteWithMeasurement> {
         return ammoniteService.findMatchingAmmonitesWithMeasurements(
             diameterSide,
             diameterCross,
