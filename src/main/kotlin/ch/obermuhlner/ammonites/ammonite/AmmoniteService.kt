@@ -5,7 +5,6 @@ import ch.obermuhlner.ammonites.jooq.tables.pojos.Ammonite
 import ch.obermuhlner.ammonites.jooq.tables.pojos.Measurement
 import org.jooq.Record
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
@@ -37,7 +36,7 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         return ammoniteRepository.deleteById(id)
     }
 
-    data class AmmoniteWithMeasurement(val ammonite: Ammonite, val measurement: Measurement)
+    data class AmmoniteWithMeasurement(val distance: Double, val ammonite: Ammonite, val measurement: Measurement)
 
     fun findMatchingAmmonitesWithMeasurements(
         diameterSide: Double? = null,
@@ -48,7 +47,7 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         proportion_q: Double? = null,
         count_z: Double? = null,
         limit: Int = 5
-    ): Map<Double, AmmoniteWithMeasurement> {
+    ): List<AmmoniteWithMeasurement> {
         val records = ammoniteRepository.findMatchingAmmonitesWithMeasurements()
         return records
             .map { record ->
@@ -57,12 +56,12 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
             .sortedBy { pair -> pair.first }
             .take(limit)
             .map { pair ->
+                val distance = pair.first
                 val record = pair.second
                 val ammonite = record.into(Ammonite::class.java)
                 val measurement = record.into(Measurement::class.java)
-                Pair(pair.first, AmmoniteWithMeasurement(ammonite, measurement))
+                AmmoniteWithMeasurement(distance, ammonite, measurement)
             }
-            .toMap(TreeMap())
     }
 
     fun sumOfRelativeSquareErrors(
