@@ -41,6 +41,7 @@ class AmmoniteRepository(private val dsl: DSLContext) {
                 .set(AMMONITE.TAXONOMY_SPECIES, ammonite.taxonomySpecies)
                 .set(AMMONITE.DESCRIPTION, ammonite.description)
                 .set(AMMONITE.STRATA, ammonite.strata)
+                .set(AMMONITE.IMAGE_ID, ammonite.imageId)
                 .where(AMMONITE.ID.eq(ammonite.id))
                 .execute()
             return ammonite

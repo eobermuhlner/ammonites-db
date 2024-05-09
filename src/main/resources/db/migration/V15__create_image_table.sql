@@ -1,0 +1,6 @@
+CREATE TABLE image (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    data TEXT NOT NULL,
+    media_type VARCHAR(255) NOT NULL
+);

@@ -38,6 +38,7 @@ class MeasurementRepository(private val dsl: DSLContext) {
                 .set(MEASUREMENT.COUNT_Z, measurement.countZ)
                 .set(MEASUREMENT.COMMENT, measurement.comment)
                 .set(MEASUREMENT.AMMONITE_ID, measurement.ammoniteId)
+                .set(MEASUREMENT.IMAGE_ID, measurement.imageId)
                 .where(MEASUREMENT.ID.eq(measurement.id))
                 .execute()
             return measurement
