@@ -3,7 +3,6 @@ package ch.obermuhlner.ammonites.ammonite
 import ch.obermuhlner.ammonites.jooq.Tables
 import ch.obermuhlner.ammonites.jooq.Tables.AMMONITE
 import ch.obermuhlner.ammonites.jooq.tables.pojos.Ammonite
-import ch.obermuhlner.ammonites.jooq.tables.pojos.Measurement
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Result
@@ -52,24 +51,10 @@ class AmmoniteRepository(private val dsl: DSLContext) {
         return dsl.deleteFrom(AMMONITE).where(AMMONITE.ID.eq(id)).execute() == 1
     }
 
-//    data class AmmoniteWithMeasurements (val ammonite: Ammonite, val measurement: Measurement)
-//    fun findAllWithMeasurements(): List<AmmoniteWithMeasurements> {
-//        return dsl.select()
-//            .from(AMMONITE)
-//            .join(Tables.MEASUREMENT).on(AMMONITE.ID.eq(Tables.MEASUREMENT.AMMONITE_ID))
-//            .fetch()
-//            .map { record ->
-//                val ammonite = record.into(Ammonite::class.java)
-//                val measurement = record.into(Measurement::class.java)
-//                AmmoniteWithMeasurements(ammonite, measurement)
-//            }
-//    }
-
     fun findMatchingAmmonitesWithMeasurements(): Result<Record> {
         return dsl.select()
             .from(AMMONITE)
             .join(Tables.MEASUREMENT).on(AMMONITE.ID.eq(Tables.MEASUREMENT.AMMONITE_ID))
             .fetch()
     }
-
 }
