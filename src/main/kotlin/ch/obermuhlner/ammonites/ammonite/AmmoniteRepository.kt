@@ -24,6 +24,10 @@ class AmmoniteRepository(private val dsl: DSLContext) {
         return dsl.fetchExists(dsl.selectFrom(AMMONITE).where(AMMONITE.ID.eq(id)))
     }
 
+    fun findByTaxonomySpecies(taxonomySpecies: String): Optional<Ammonite> {
+        return dsl.selectFrom(AMMONITE).where(AMMONITE.TAXONOMY_SPECIES.eq(taxonomySpecies)).fetchOptionalInto(Ammonite::class.java)
+    }
+
     fun save(ammonite: Ammonite): Ammonite {
         if (ammonite.id == null) {
             val record = dsl.newRecord(AMMONITE, ammonite)

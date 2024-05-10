@@ -24,10 +24,13 @@ val jdbcPassword = ""
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework:spring-jdbc")
     implementation("org.jooq:jooq:$jooqVersion")
     implementation("com.h2database:h2:$h2Version")
     jooqGenerator("com.h2database:h2:$h2Version")
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
     runtimeOnly("org.slf4j:slf4j-simple:1.7.32")
     testImplementation(kotlin("test"))
 }

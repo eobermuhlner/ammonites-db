@@ -24,6 +24,10 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         return ammoniteRepository.findById(id).orElse(null)
     }
 
+    fun findByTaxonomySpecies(taxonomySpecies: String): Ammonite? {
+        return ammoniteRepository.findByTaxonomySpecies(taxonomySpecies).orElse(null)
+    }
+
     fun updateById(id: Int, updatedAmmonite: Ammonite): Ammonite? {
         if (ammoniteRepository.existsById(id)) {
             updatedAmmonite.id = id
