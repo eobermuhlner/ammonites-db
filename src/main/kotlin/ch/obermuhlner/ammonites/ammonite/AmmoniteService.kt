@@ -58,8 +58,35 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
             .map { pair ->
                 val distance = pair.first
                 val record = pair.second
-                val ammonite = record.into(Ammonite::class.java)
-                val measurement = record.into(Measurement::class.java)
+
+                val ammonite = Ammonite(
+                    record.get(Tables.AMMONITE.ID),
+                    record.get(Tables.AMMONITE.TAXONOMY_SUBCLASS),
+                    record.get(Tables.AMMONITE.TAXONOMY_FAMILY),
+                    record.get(Tables.AMMONITE.TAXONOMY_SUBFAMILY),
+                    record.get(Tables.AMMONITE.TAXONOMY_GENUS),
+                    record.get(Tables.AMMONITE.TAXONOMY_SUBGENUS),
+                    record.get(Tables.AMMONITE.TAXONOMY_SPECIES),
+                    record.get(Tables.AMMONITE.STRATA),
+                    record.get(Tables.AMMONITE.DESCRIPTION),
+                    record.get(Tables.AMMONITE.COMMENT),
+                    record.get(Tables.AMMONITE.IMAGE_ID)
+                )
+
+                val measurement = Measurement(
+                    record.get(Tables.MEASUREMENT.ID),
+                    record.get(Tables.MEASUREMENT.DIAMETER_SIDE),
+                    record.get(Tables.MEASUREMENT.DIAMETER_CROSS),
+                    record.get(Tables.MEASUREMENT.PROPORTION_N),
+                    record.get(Tables.MEASUREMENT.PROPORTION_H),
+                    record.get(Tables.MEASUREMENT.PROPORTION_B),
+                    record.get(Tables.MEASUREMENT.PROPORTION_Q),
+                    record.get(Tables.MEASUREMENT.COUNT_Z),
+                    record.get(Tables.MEASUREMENT.COMMENT),
+                    record.get(Tables.MEASUREMENT.AMMONITE_ID),
+                    record.get(Tables.MEASUREMENT.IMAGE_ID)
+                )
+
                 AmmoniteWithMeasurement(distance, ammonite, measurement)
             }
     }
