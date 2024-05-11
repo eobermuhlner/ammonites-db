@@ -28,12 +28,12 @@ class ImportRestController @Autowired constructor(
 
         val parser = ImportParserFactory().getParser(file.contentType)
         val result = parser.parse(file.inputStream,
-            { headers -> "Headers: $headers" },
-            { cells ->
+            { headers, log -> log.append("Headers: $headers\n") },
+            { cells, log ->
                 if (cells.size >= 11) {
-                    processAmmoniteRow(cells[0], cells[1], cells[2], cells[3], cells[4], cells[5], cells[6], cells[7], cells[8], cells[9].toBoolean(), cells[10])
+                    processAmmoniteRow(cells[0], cells[1], cells[2], cells[3], cells[4], cells[5], cells[6], cells[7], cells[8], cells[9].toBoolean(), cells[10], log)
                 } else {
-                    "Invalid data format: $cells"
+                    log.append("Invalid data format: $cells")
                 }
             })
         return ResponseEntity.ok("Import successful:\n$result")
@@ -50,36 +50,38 @@ class ImportRestController @Autowired constructor(
         description: String,
         comment: String,
         overwriteImage: Boolean,
-        imageFilePath: String
-    ): String {
+        imageFilePath: String,
+        log: StringBuilder
+    ) {
         val oldAmmonite = ammoniteService.findByTaxonomySpecies(taxonomySpecies)
 
         val imageId = if (overwriteImage || oldAmmonite?.imageId == null) {
             val imageFile = File(imageFilePath)
-            if (!imageFile.exists()) {
-                return "Image file not found: $imageFilePath"
+            if (imageFile.exists()) {
+                val imageBytes = imageFile.readBytes()
+                val base64Image = Base64.getEncoder().encodeToString(imageBytes)
+                val name = imageFile.name
+                val mediaType = URLConnection.guessContentTypeFromName(name)
+                val image = Image(null, name, base64Image, mediaType)
+                val savedImage = imageService.save(image)
+                savedImage.id
+            } else {
+                log.append("Image file not found: $imageFilePath\n")
+                null
             }
-            val imageBytes = imageFile.readBytes()
-            val base64Image = Base64.getEncoder().encodeToString(imageBytes)
-            val name = imageFile.name
-            val mediaType = URLConnection.guessContentTypeFromName(name)
-            val image = Image(null, name, base64Image, mediaType)
-            val savedImage = imageService.save(image)
-            savedImage.id
         } else {
             oldAmmonite.imageId
         }
 
         val newAmmonite = Ammonite(null, taxonomySubclass, taxonomyFamily, taxonomySubfamily, taxonomyGenus, taxonomySubgenus, taxonomySpecies, strata, description, comment, imageId)
 
-        val result = if (oldAmmonite == null) {
+        if (oldAmmonite == null) {
             val id = ammoniteService.create(newAmmonite)
-            return "New ammonite: $id '${newAmmonite.taxonomySpecies}'"
+            log.append("New ammonite: $id '${newAmmonite.taxonomySpecies}'\n")
         } else {
             ammoniteService.updateById(oldAmmonite.id, newAmmonite)
-            return "Updated ammonite: ${oldAmmonite.id} '${newAmmonite.taxonomySpecies}'"
+            log.append("Updated ammonite: ${oldAmmonite.id} '${newAmmonite.taxonomySpecies}'\n")
         }
-        return result
     }
 
     @PostMapping("/ammonite/images")
@@ -90,28 +92,31 @@ class ImportRestController @Autowired constructor(
 
         val parser = ImportParserFactory().getParser(file.contentType)
         val result = parser.parse(file.inputStream,
-            { headers -> "Headers: $headers" },
-            { cells ->
+            { headers, log -> log.append("Headers: $headers\n") },
+            { cells, log ->
                 if (cells.size >= 3) {
-                    processAmmoniteImageRow(cells[0], cells[1].toBoolean(), cells[2])
+                    processAmmoniteImageRow(cells[0], cells[1].toBoolean(), cells[2], log)
                 } else {
-                    "Invalid data format: $cells"
+                    log.append("Invalid data format: $cells\n")
                 }
             })
         return ResponseEntity.ok("Import successful:\n$result")
     }
 
-    private fun processAmmoniteImageRow(taxonomySpecies: String, overwrite: Boolean, imageFilePath: String): String {
+    private fun processAmmoniteImageRow(taxonomySpecies: String, overwrite: Boolean, imageFilePath: String, log: StringBuilder) {
         val ammonite = ammoniteService.findByTaxonomySpecies(taxonomySpecies)
         if (ammonite == null) {
-            return "Ammonite not found: '$taxonomySpecies'"
+            log.append("Ammonite not found: '$taxonomySpecies'\n")
+            return
         }
         if (ammonite.imageId != null && !overwrite) {
-            return "Ammonite already has image: '$taxonomySpecies' id=${ammonite.id} imageId=${ammonite.imageId}"
+            log.append("Ammonite already has image: '$taxonomySpecies' id=${ammonite.id} imageId=${ammonite.imageId}\n")
+            return
         }
         val imageFile = File(imageFilePath)
         if (!imageFile.exists()) {
-            return "Image file not found: $imageFilePath"
+            log.append("Image file not found: $imageFilePath\n")
+            return
         }
         val imageBytes = imageFile.readBytes()
         val base64Image = Base64.getEncoder().encodeToString(imageBytes)
@@ -123,6 +128,6 @@ class ImportRestController @Autowired constructor(
         val oldImageId = ammonite.imageId
         ammonite.imageId = savedImage.id
         ammoniteService.updateById(ammonite.id, ammonite)
-        return "Ammonite image set: $taxonomySpecies id=${ammonite.id} imageId=${ammonite.imageId} oldImageId=${oldImageId}"
+        log.append("Ammonite image set: $taxonomySpecies id=${ammonite.id} imageId=${ammonite.imageId} oldImageId=${oldImageId}\n")
     }
 }

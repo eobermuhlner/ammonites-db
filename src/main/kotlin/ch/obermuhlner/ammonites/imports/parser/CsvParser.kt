@@ -6,8 +6,12 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
 class CsvParser : ImportParser {
-    override fun parse(inputStream: InputStream, processHeader: (List<String>) -> String, processRow: (List<String>) -> String): String {
-        val result = StringBuilder()
+    override fun parse(
+        inputStream: InputStream,
+        processHeader: (row: List<String>, log: StringBuilder) -> Unit,
+        processRow: (row: List<String>, log: StringBuilder) -> Unit
+    ): String {
+        val log = StringBuilder()
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, StandardCharsets.UTF_8))
         var rowCount = 0
         bufferedReader.useLines { lines ->
@@ -16,14 +20,14 @@ class CsvParser : ImportParser {
                     println("LINE: $line")
                     val parts = parseCsvLine(line)
                     if (rowCount == 0) {
-                        result.append(processHeader(parts)).append("\n")
+                        processHeader(parts, log)
                     } else {
-                        result.append(processRow(parts)).append("\n")
+                        processRow(parts, log)
                     }
                     rowCount++
                 }
         }
-        return result.toString()
+        return log.toString()
     }
 
     private fun parseCsvLine(line: String): List<String> {
