@@ -48,7 +48,7 @@ class ImportRestController @Autowired constructor(
                         imageFilePath = cells[10],
                         log)
                 } else {
-                    log.append("Invalid data format: $cells")
+                    log.append("Invalid data format: $cells\n")
                 }
             })
         return ResponseEntity.ok("Import successful:\n$result")
@@ -106,7 +106,7 @@ class ImportRestController @Autowired constructor(
                         cells[10],
                         log)
                 } else {
-                    log.append("Invalid data format: $cells")
+                    log.append("Invalid data format: $cells\n")
                 }
             })
         return ResponseEntity.ok("Import successful:\n$result")
