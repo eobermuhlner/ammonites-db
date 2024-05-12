@@ -49,16 +49,15 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         proportion_h: Double? = null,
         proportion_b: Double? = null,
         proportion_q: Double? = null,
-        count_z: Double? = null,
-        limit: Int = 5
+        count_z: Double? = null
     ): List<AmmoniteWithMeasurement> {
         val records = ammoniteRepository.findMatchingAmmonitesWithMeasurements()
-        return records
-            .map { record ->
-                Pair(sumOfRelativeSquareErrors(record!!, diameterSide, diameterCross, proportion_n, proportion_h, proportion_b, proportion_q, count_z), record)
+
+        val filteredRecords = records
+            .mapNotNull { record ->
+                Pair(matchingDistance(record, diameterSide, diameterCross, proportion_n, proportion_h, proportion_b, proportion_q, count_z), record)
             }
-            .sortedBy { pair -> pair.first }
-            .take(limit)
+            .sortedBy { it.first }
             .map { pair ->
                 val distance = pair.first
                 val record = pair.second
@@ -93,9 +92,12 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
 
                 AmmoniteWithMeasurement(distance, ammonite, measurement)
             }
+            .distinctBy { it.ammonite.taxonomySpecies }
+
+        return filteredRecords
     }
 
-    fun sumOfRelativeSquareErrors(
+    fun matchingDistance(
         record: Record,
         diameterSide: Double? = null,
         diameterCross: Double? = null,
@@ -105,7 +107,7 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         proportion_q: Double? = null,
         count_z: Double? = null,
         weightDiameterSide: Double = 0.1,
-        weightDiameterCross: Double = 0.1,
+        weightDiameterCross: Double = 0.2,
         weightProportion_n: Double = 1.0,
         weightProportion_h: Double = 1.0,
         weightProportion_b: Double = 1.0,
@@ -122,7 +124,24 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         sum += relativeSquareError(proportion_q, record[Tables.MEASUREMENT.PROPORTION_Q]) * weightProportion_q
         sum += relativeSquareError(count_z, record[Tables.MEASUREMENT.COUNT_Z]) * weightCount_z
 
-        return sum
+        var count = 0
+        count += isAvailable(diameterSide, record[Tables.MEASUREMENT.DIAMETER_SIDE])
+        count += isAvailable(diameterCross, record[Tables.MEASUREMENT.DIAMETER_CROSS])
+        count += isAvailable(proportion_n, record[Tables.MEASUREMENT.PROPORTION_N])
+        count += isAvailable(proportion_h, record[Tables.MEASUREMENT.PROPORTION_H])
+        count += isAvailable(proportion_b, record[Tables.MEASUREMENT.PROPORTION_B])
+        count += isAvailable(proportion_q, record[Tables.MEASUREMENT.PROPORTION_Q])
+        count += isAvailable(count_z, record[Tables.MEASUREMENT.COUNT_Z])
+
+        if (count == 0) {
+            return 1.0
+        }
+
+        return sum / count
+    }
+
+    private fun isAvailable(sampleValue: Double?, referenceValue: Double?): Int {
+        return if (sampleValue != null && referenceValue != null) 1 else 0
     }
 
     private fun relativeSquareError(value: Double?, referenceValue: Double?): Double {
