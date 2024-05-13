@@ -49,13 +49,15 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         proportion_h: Double? = null,
         proportion_b: Double? = null,
         proportion_q: Double? = null,
-        count_z: Double? = null
+        count_primary_ribs: Double? = null,
+        count_secondary_ribs: Double? = null,
+        rib_division_ratio: Double? = null
     ): List<AmmoniteWithMeasurement> {
         val records = ammoniteRepository.findMatchingAmmonitesWithMeasurements()
 
         val filteredRecords = records
             .mapNotNull { record ->
-                Pair(matchingDistance(record, diameterSide, diameterCross, proportion_n, proportion_h, proportion_b, proportion_q, count_z), record)
+                Pair(matchingDistance(record, diameterSide, diameterCross, proportion_n, proportion_h, proportion_b, proportion_q, count_primary_ribs), record)
             }
             .sortedBy { it.first }
             .map { pair ->
@@ -84,11 +86,13 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
                     record.get(Tables.MEASUREMENT.PROPORTION_H),
                     record.get(Tables.MEASUREMENT.PROPORTION_B),
                     record.get(Tables.MEASUREMENT.PROPORTION_Q),
-                    record.get(Tables.MEASUREMENT.COUNT_Z),
+                    record.get(Tables.MEASUREMENT.COUNT_PRIMARY_RIBS),
                     record.get(Tables.MEASUREMENT.COMMENT),
                     record.get(Tables.MEASUREMENT.AMMONITE_ID),
-                    record.get(Tables.MEASUREMENT.IMAGE_ID)
-                )
+                    record.get(Tables.MEASUREMENT.IMAGE_ID),
+                    record.get(Tables.MEASUREMENT.COUNT_SECONDARY_RIBS),
+                    record.get(Tables.MEASUREMENT.RIB_DIVISION_RATIO),
+                    )
 
                 AmmoniteWithMeasurement(distance, ammonite, measurement)
             }
@@ -105,14 +109,18 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         proportion_h: Double? = null,
         proportion_b: Double? = null,
         proportion_q: Double? = null,
-        count_z: Double? = null,
+        count_primary_ribs: Double? = null,
+        count_secondary_ribs: Double? = null,
+        rib_division_ratio: Double? = null,
         weightDiameterSide: Double = 0.1,
         weightDiameterCross: Double = 0.2,
         weightProportion_n: Double = 1.0,
         weightProportion_h: Double = 1.0,
         weightProportion_b: Double = 1.0,
         weightProportion_q: Double = 1.0,
-        weightCount_z: Double = 1.0,
+        weightCount_primary_ribs: Double = 1.0,
+        weightCount_secondary_ribs: Double = 1.0,
+        weightRib_division_ratio: Double = 1.0,
     ): Double {
         var sum = 0.0
 
@@ -122,7 +130,9 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         sum += relativeSquareError(proportion_h, record[Tables.MEASUREMENT.PROPORTION_H]) * weightProportion_h
         sum += relativeSquareError(proportion_b, record[Tables.MEASUREMENT.PROPORTION_B]) * weightProportion_b
         sum += relativeSquareError(proportion_q, record[Tables.MEASUREMENT.PROPORTION_Q]) * weightProportion_q
-        sum += relativeSquareError(count_z, record[Tables.MEASUREMENT.COUNT_Z]) * weightCount_z
+        sum += relativeSquareError(count_primary_ribs, record[Tables.MEASUREMENT.COUNT_PRIMARY_RIBS]) * weightCount_primary_ribs
+        sum += relativeSquareError(count_secondary_ribs, record[Tables.MEASUREMENT.COUNT_SECONDARY_RIBS]) * weightCount_secondary_ribs
+        sum += relativeSquareError(rib_division_ratio, record[Tables.MEASUREMENT.RIB_DIVISION_RATIO]) * weightRib_division_ratio
 
         var count = 0
         count += isAvailable(diameterSide, record[Tables.MEASUREMENT.DIAMETER_SIDE])
@@ -131,7 +141,9 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         count += isAvailable(proportion_h, record[Tables.MEASUREMENT.PROPORTION_H])
         count += isAvailable(proportion_b, record[Tables.MEASUREMENT.PROPORTION_B])
         count += isAvailable(proportion_q, record[Tables.MEASUREMENT.PROPORTION_Q])
-        count += isAvailable(count_z, record[Tables.MEASUREMENT.COUNT_Z])
+        count += isAvailable(count_primary_ribs, record[Tables.MEASUREMENT.COUNT_PRIMARY_RIBS])
+        count += isAvailable(count_secondary_ribs, record[Tables.MEASUREMENT.COUNT_SECONDARY_RIBS])
+        count += isAvailable(rib_division_ratio, record[Tables.MEASUREMENT.RIB_DIVISION_RATIO])
 
         if (count == 0) {
             return 1.0

@@ -41,9 +41,9 @@ class ImportRestController @Autowired constructor(
                         taxonomyGenus = cells[3],
                         taxonomySubgenus = cells[4],
                         taxonomySpecies = cells[5],
-                        strata = cells[6],
-                        description = cells[7],
-                        comment = cells[8],
+                        description = cells[6],
+                        comment = cells[7],
+                        strata = cells[8],
                         overwriteImage = cells[9].toBoolean(),
                         imageFilePath = cells[10],
                         log)
@@ -61,9 +61,9 @@ class ImportRestController @Autowired constructor(
         taxonomyGenus: String,
         taxonomySubgenus: String,
         taxonomySpecies: String,
-        strata: String,
         description: String,
         comment: String,
+        strata: String,
         overwriteImage: Boolean,
         imageFilePath: String,
         log: StringBuilder
@@ -91,7 +91,7 @@ class ImportRestController @Autowired constructor(
         val result = parser.parse(file.inputStream,
             { headers, log -> log.append("Headers: $headers\n") },
             { cells, log ->
-                if (cells.size >= 11) {
+                if (cells.size >= 13) {
                     processAmmoniteMeasurementRow(
                         taxonomySpecies = cells[0],
                         diameterSide = cells[1].toDoubleOrNull(),
@@ -100,10 +100,12 @@ class ImportRestController @Autowired constructor(
                         proportionH = cells[4].toDoubleOrNull(),
                         proportionB = cells[5].toDoubleOrNull(),
                         proportionQ = cells[6].toDoubleOrNull(),
-                        countZ = cells[7].toDoubleOrNull(),
-                        comment = cells[8],
-                        cells[9].toBoolean(),
-                        cells[10],
+                        countPrimaryRibs = cells[7].toDoubleOrNull(),
+                        countSecondaryRibs = cells[8].toDoubleOrNull(),
+                        ribDivisionRatio = cells[9].toDoubleOrNull(),
+                        comment = cells[10],
+                        cells[11].toBoolean(),
+                        cells[12],
                         log)
                 } else {
                     log.append("Invalid data format: $cells\n")
@@ -120,7 +122,9 @@ class ImportRestController @Autowired constructor(
         proportionH: Double?,
         proportionB: Double?,
         proportionQ: Double?,
-        countZ: Double?,
+        countPrimaryRibs: Double?,
+        countSecondaryRibs: Double?,
+        ribDivisionRatio: Double?,
         comment: String,
         overwriteImage: Boolean,
         imageFilePath: String,
@@ -132,7 +136,7 @@ class ImportRestController @Autowired constructor(
             return
         }
         val imageId = uploadImageIfNecessary(overwriteImage, ammonite.imageId, imageFilePath, log)
-        val measurement = measurementService.create(Measurement(null, diameterSide, diameterCross, proportionN, proportionH, proportionB, proportionQ, countZ, comment, ammonite.id, imageId))
+        val measurement = measurementService.create(Measurement(null, diameterSide, diameterCross, proportionN, proportionH, proportionB, proportionQ, countPrimaryRibs, comment, ammonite.id, imageId, countSecondaryRibs, ribDivisionRatio))
         log.append("Measurement added: '$taxonomySpecies' $measurement\n")
     }
 
