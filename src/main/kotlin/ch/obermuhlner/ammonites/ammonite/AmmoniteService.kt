@@ -51,7 +51,8 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         proportion_q: Double? = null,
         count_primary_ribs: Double? = null,
         count_secondary_ribs: Double? = null,
-        rib_division_ratio: Double? = null
+        rib_division_ratio: Double? = null,
+        limit: Int = 10
     ): List<AmmoniteWithMeasurement> {
         val records = ammoniteRepository.findMatchingAmmonitesWithMeasurements()
 
@@ -97,6 +98,7 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
                 AmmoniteWithMeasurement(distance, ammonite, measurement)
             }
             .distinctBy { it.ammonite.taxonomySpecies }
+            .take(limit)
 
         return filteredRecords
     }

@@ -65,7 +65,8 @@ class AmmoniteRestController @Autowired constructor(
         @RequestParam(required = false) proportionQ: Double? = null,
         @RequestParam(required = false) countPrimaryRibs: Double? = null,
         @RequestParam(required = false) countSecondaryRibs: Double? = null,
-        @RequestParam(required = false) ribDivisionRatio: Double? = null
+        @RequestParam(required = false) ribDivisionRatio: Double? = null,
+        @RequestParam(defaultValue = "10")limit: Int
     ): List<AmmoniteService.AmmoniteWithMeasurement> {
         return ammoniteService.findMatchingAmmonitesWithMeasurements(
             diameterSide,
@@ -76,6 +77,7 @@ class AmmoniteRestController @Autowired constructor(
             proportionQ,
             countPrimaryRibs,
             countSecondaryRibs,
-            ribDivisionRatio)
+            ribDivisionRatio,
+            limit)
     }
 }
