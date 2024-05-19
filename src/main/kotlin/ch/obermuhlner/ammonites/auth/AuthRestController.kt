@@ -28,7 +28,11 @@ class AuthRestController(private val authenticationManager: AuthenticationManage
         return try {
             val authentication: Authentication = authenticationManager.authenticate(authenticationToken)
             SecurityContextHolder.getContext().authentication = authentication
-            val token = JwtUtil.generateToken(loginRequest.username)
+
+            val userDetails = authentication.principal as org.springframework.security.core.userdetails.User
+            val roles = userDetails.authorities.map { it.authority }
+
+            val token = JwtUtil.generateToken(loginRequest.username, roles)
             ResponseEntity.ok(LoginResponse("Login successful", token))
         } catch (ex: Exception) {
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse("Login failed: ${ex.message}", null))

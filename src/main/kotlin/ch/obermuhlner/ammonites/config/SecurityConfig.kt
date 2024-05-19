@@ -44,6 +44,8 @@ class SecurityConfig(
                     .requestMatchers("/login").permitAll()
                     .requestMatchers("/csrf-token").permitAll()
                     .requestMatchers("/actuator/**").permitAll()
+                    .requestMatchers("/import/**").hasRole("ADMIN")
+                    .requestMatchers("/search/**").hasRole("USER")
                     .anyRequest().authenticated()
             }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
@@ -95,6 +97,7 @@ class JwtAuthenticationFilter : OncePerRequestFilter() {
             val token = authorizationHeader.substring(7)
             if (JwtUtil.validateToken(token)) {
                 val username = JwtUtil.getUsernameFromToken(token)
+                val roles = JwtUtil.getRolesFromToken(token)
                 val authentication = UsernamePasswordAuthenticationToken(username, null, emptyList())
                 SecurityContextHolder.getContext().authentication = authentication
             }
