@@ -44,8 +44,9 @@ class SecurityConfig(
                     .requestMatchers("/login").permitAll()
                     .requestMatchers("/csrf-token").permitAll()
                     .requestMatchers("/actuator/**").permitAll()
-                    .requestMatchers("/import/**").hasRole("ADMIN")
-                    .requestMatchers("/search/**").hasRole("USER")
+                    .requestMatchers("/api/users/new").permitAll()
+//                    .requestMatchers("/import/**").hasRole("ADMIN")
+//                    .requestMatchers("/search/**").hasRole("USER")
                     .anyRequest().authenticated()
             }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
