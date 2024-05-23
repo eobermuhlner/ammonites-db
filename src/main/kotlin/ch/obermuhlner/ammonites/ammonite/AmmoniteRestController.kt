@@ -25,6 +25,15 @@ class AmmoniteRestController @Autowired constructor(
         return ResponseEntity(ammonites, HttpStatus.OK)
     }
 
+    @GetMapping("/taxonomy/{level}")
+    fun getTaxonomyOptions(
+        @PathVariable level: String,
+        @RequestParam(required = false) parent: String?
+    ): ResponseEntity<List<String>> {
+        val options = ammoniteService.getTaxonomyOptions(level, parent)
+        return ResponseEntity(options, HttpStatus.OK)
+    }
+
     @GetMapping("/{id}")
     fun findById(@PathVariable id: Int): ResponseEntity<Ammonite?> {
         val ammonite = ammoniteService.findById(id)
@@ -53,6 +62,12 @@ class AmmoniteRestController @Autowired constructor(
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
+    }
+
+    @GetMapping("/browse")
+    fun fetchBrowseAmmonites(@RequestParam filters: Map<String, String>): ResponseEntity<List<Ammonite>> {
+        val ammonites = ammoniteService.fetchBrowseAmmonites(filters)
+        return ResponseEntity(ammonites, HttpStatus.OK)
     }
 
     @GetMapping("/matching")

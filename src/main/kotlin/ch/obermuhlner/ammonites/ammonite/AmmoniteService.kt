@@ -24,6 +24,21 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         return ammoniteRepository.findById(id).orElse(null)
     }
 
+    fun getTaxonomyOptions(level: String, parent: String?): List<String> {
+        return when (level) {
+            "subclass" -> ammoniteRepository.findDistinctSubclass()
+            "family" -> ammoniteRepository.findDistinctFamily(parent)
+            "subfamily" -> ammoniteRepository.findDistinctSubfamily(parent)
+            "genus" -> ammoniteRepository.findDistinctGenus(parent)
+            "subgenus" -> ammoniteRepository.findDistinctSubgenus(parent)
+            else -> throw IllegalArgumentException("Invalid taxonomy level: $level")
+        }
+    }
+
+    fun fetchBrowseAmmonites(filters: Map<String, String>): List<Ammonite> {
+        return ammoniteRepository.fetchBrowseAmmonites(filters)
+    }
+
     fun findByTaxonomySpecies(taxonomySpecies: String): Ammonite? {
         return ammoniteRepository.findByTaxonomySpecies(taxonomySpecies).orElse(null)
     }
