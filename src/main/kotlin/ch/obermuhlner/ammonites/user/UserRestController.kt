@@ -56,10 +56,19 @@ class UserRestController @Autowired constructor(
             if (updatedUser.password != null) {
                 updatedUser.password = passwordEncoder.encode(updatedUser.password)
             }
-            userService.updateUser(updatedUser)
+            userService.updateUser(updatedUser, false)
             ResponseEntity(updatedUser, HttpStatus.OK)
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
+
+    @PutMapping("/{id}/password")
+    fun changePassword(@PathVariable id: Long, @RequestParam password: String) {
+        val user = userService.findUserById(id)
+        if (user != null) {
+            user.password = password
+            userService.updateUser(user, changePassword = true)
         }
     }
 

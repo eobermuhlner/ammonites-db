@@ -34,8 +34,13 @@ class UserService(
         return userRepository.findUserById(id)
     }
 
-    fun updateUser(user: Users) {
-        userRepository.updateUser(user)
+    fun updateUser(user: Users, changePassword: Boolean = false) {
+        if (changePassword && user.password != null && user.password.isNotEmpty()) {
+            user.password = passwordEncoder.encode(user.password)
+            userRepository.updateUserWithPassword(user)
+        } else {
+            userRepository.updateUserWithoutPassword(user)
+        }
     }
 
     fun deleteUserById(id: Long): Boolean {

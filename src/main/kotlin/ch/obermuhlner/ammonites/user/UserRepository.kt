@@ -33,7 +33,15 @@ class UserRepository(private val dsl: DSLContext) {
             .fetchOneInto(Users::class.java)
     }
 
-    fun updateUser(user: Users) {
+    fun updateUserWithoutPassword(user: Users) {
+        dsl.update(USERS)
+            .set(USERS.USERNAME, user.username)
+            .set(USERS.ENABLED, user.enabled)
+            .where(USERS.ID.eq(user.id))
+            .execute()
+    }
+
+    fun updateUserWithPassword(user: Users) {
         dsl.update(USERS)
             .set(dsl.newRecord(USERS, user))
             .where(USERS.ID.eq(user.id))
