@@ -5,10 +5,12 @@ import ch.obermuhlner.ammonites.jooq.tables.pojos.Ammonite
 import ch.obermuhlner.ammonites.jooq.tables.pojos.Measurement
 import org.jooq.Record
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
 
+    @Transactional
     fun create(ammonite: Ammonite): Ammonite {
         if (ammonite.id != null) {
             throw IllegalArgumentException("Not allowed to create with explicit id")
@@ -16,14 +18,17 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         return ammoniteRepository.save(ammonite)
     }
 
+    @Transactional(readOnly = true)
     fun findAll(): List<Ammonite> {
         return ammoniteRepository.findAll()
     }
 
+    @Transactional(readOnly = true)
     fun findById(id: Int): Ammonite? {
         return ammoniteRepository.findById(id).orElse(null)
     }
 
+    @Transactional(readOnly = true)
     fun getTaxonomyOptions(level: String, parent: String?): List<String> {
         return when (level) {
             "subclass" -> ammoniteRepository.findDistinctSubclass()
@@ -35,14 +40,17 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         }
     }
 
+    @Transactional(readOnly = true)
     fun fetchBrowseAmmonites(filters: Map<String, String>): List<Ammonite> {
         return ammoniteRepository.fetchBrowseAmmonites(filters)
     }
 
+    @Transactional(readOnly = true)
     fun findByTaxonomySpecies(taxonomySpecies: String): Ammonite? {
         return ammoniteRepository.findByTaxonomySpecies(taxonomySpecies).orElse(null)
     }
 
+    @Transactional
     fun updateById(id: Int, updatedAmmonite: Ammonite): Ammonite? {
         if (ammoniteRepository.existsById(id)) {
             updatedAmmonite.id = id
@@ -51,12 +59,14 @@ class AmmoniteService(private val ammoniteRepository: AmmoniteRepository) {
         return null
     }
 
+    @Transactional(readOnly = true)
     fun deleteById(id: Int): Boolean {
         return ammoniteRepository.deleteById(id)
     }
 
     data class AmmoniteWithMeasurement(val distance: Double, val ammonite: Ammonite, val measurement: Measurement)
 
+    @Transactional(readOnly = true)
     fun findMatchingAmmonitesWithMeasurements(
         diameterSide: Double? = null,
         diameterCross: Double? = null,

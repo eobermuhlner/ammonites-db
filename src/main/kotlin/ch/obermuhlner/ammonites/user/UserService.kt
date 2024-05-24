@@ -14,6 +14,7 @@ class UserService(
     @Value("\${admin.username}") private val adminUsername: String,
     @Value("\${admin.password}") private val adminPassword: String
 ) {
+    @Transactional(readOnly = true)
     fun isUsernameAvailable(username: String): Boolean {
         return userRepository.isUsernameAvailable(username)
     }
@@ -26,14 +27,17 @@ class UserService(
         userRepository.saveUser(username, passwordEncoder.encode(password), true)
     }
 
+    @Transactional(readOnly = true)
     fun findAllUsers(): List<Users> {
         return userRepository.findAllUsers()
     }
 
+    @Transactional(readOnly = true)
     fun findUserById(id: Long): Users? {
         return userRepository.findUserById(id)
     }
 
+    @Transactional
     fun updateUser(user: Users, changePassword: Boolean = false) {
         if (changePassword && user.password != null && user.password.isNotEmpty()) {
             user.password = passwordEncoder.encode(user.password)
@@ -43,6 +47,7 @@ class UserService(
         }
     }
 
+    @Transactional(readOnly = true)
     fun deleteUserById(id: Long): Boolean {
         return userRepository.deleteUserById(id)
     }
