@@ -14,42 +14,43 @@ class UserRestController @Autowired constructor(
     private val passwordEncoder: PasswordEncoder
 ) {
     @PostMapping
-    fun create(@RequestBody user: Users): ResponseEntity<Users> {
+    fun create(@RequestBody user: Users): ResponseEntity<UserDTO> {
         if (user.id != null) {
             throw IllegalArgumentException("Not allowed to create with explicit id")
         }
         val encodedPassword = passwordEncoder.encode(user.password)
+        user.password = encodedPassword
         userService.updateUser(user)
-        return ResponseEntity(user, HttpStatus.CREATED)
+        return ResponseEntity(user.toDTO(), HttpStatus.CREATED)
     }
 
     @PostMapping("/new")
-    fun createSelfOnboarding(@RequestBody user: Users): ResponseEntity<Users> {
+    fun createSelfOnboarding(@RequestBody user: Users): ResponseEntity<UserDTO> {
         if (user.id != null) {
             throw IllegalArgumentException("Not allowed to create with explicit id")
         }
         userService.registerUser(user.username, user.password)
-        return ResponseEntity(user, HttpStatus.CREATED)
+        return ResponseEntity(user.toDTO(), HttpStatus.CREATED)
     }
 
     @GetMapping
-    fun findAll(): ResponseEntity<List<Users>> {
-        val users = userService.findAllUsers()
+    fun findAll(): ResponseEntity<List<UserDTO>> {
+        val users = userService.findAllUsers().map { it.toDTO() }
         return ResponseEntity(users, HttpStatus.OK)
     }
 
     @GetMapping("/{id}")
-    fun findById(@PathVariable id: Long): ResponseEntity<Users?> {
+    fun findById(@PathVariable id: Long): ResponseEntity<UserDTO?> {
         val user = userService.findUserById(id)
         return if (user != null) {
-            ResponseEntity(user, HttpStatus.OK)
+            ResponseEntity(user.toDTO(), HttpStatus.OK)
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
 
     @PutMapping("/{id}")
-    fun updateById(@PathVariable id: Long, @RequestBody updatedUser: Users): ResponseEntity<Users?> {
+    fun updateById(@PathVariable id: Long, @RequestBody updatedUser: Users): ResponseEntity<UserDTO?> {
         val user = userService.findUserById(id)
         return if (user != null) {
             updatedUser.id = id
@@ -57,17 +58,17 @@ class UserRestController @Autowired constructor(
                 updatedUser.password = passwordEncoder.encode(updatedUser.password)
             }
             userService.updateUser(updatedUser, false)
-            ResponseEntity(updatedUser, HttpStatus.OK)
+            ResponseEntity(updatedUser.toDTO(), HttpStatus.OK)
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
 
     @PutMapping("/{id}/password")
-    fun changePassword(@PathVariable id: Long, @RequestParam password: String) {
+    fun changePassword(@PathVariable id: Long, @RequestBody passwordRequest: PasswordRequest) {
         val user = userService.findUserById(id)
         if (user != null) {
-            user.password = password
+            user.password = passwordEncoder.encode(passwordRequest.password)
             userService.updateUser(user, changePassword = true)
         }
     }
@@ -81,4 +82,10 @@ class UserRestController @Autowired constructor(
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
+
+    private fun Users.toDTO(): UserDTO {
+        return UserDTO(id = this.id, username = this.username, enabled = this.enabled!!)
+    }
+
+    data class PasswordRequest @JvmOverloads constructor(val password: String = "")
 }
