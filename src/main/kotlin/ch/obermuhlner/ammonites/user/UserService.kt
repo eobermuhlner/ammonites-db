@@ -21,20 +21,20 @@ class UserService(
     }
 
     @Transactional
-    fun registerUserWithRoles(username: String, password: String, roles: List<Long>) {
+    fun registerUserWithRoles(username: String, password: String, email: String, firstName: String?, lastName: String?, roles: List<Long>) {
         if (!isUsernameAvailable(username)) {
             throw IllegalArgumentException("Username already taken")
         }
-        val userId = userRepository.saveUser(username, passwordEncoder.encode(password), true)
+        val userId = userRepository.saveUser(username, passwordEncoder.encode(password), email, firstName, lastName, true)
         if (userId != null) {
             userRepository.addRolesToUser(userId, roles)
         }
     }
 
     @Transactional
-    fun registerUserWithRoleNames(username: String, password: String, roles: List<String>) {
+    fun registerUserWithRoleNames(username: String, password: String, email: String, firstName: String?, lastName: String?, roles: List<String>) {
         val roleIds = roles.map { roleName -> roleRepository.findByName(roleName)!!.id }
-        registerUserWithRoles(username, password, roleIds)
+        registerUserWithRoles(username, password, email, firstName, lastName, roleIds)
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +86,7 @@ class UserService(
     @PostConstruct
     private fun createDefaultAdminUserIfNeeded() {
         if (userRepository.isUsernameAvailable(adminUsername)) {
-            registerUserWithRoleNames(adminUsername, adminPassword, listOf("ADMIN"))
+            registerUserWithRoleNames(adminUsername, adminPassword, "admin.ammonites@obermuhlner.ch", "Admin", "User", listOf("ADMIN"))
         }
     }
 }

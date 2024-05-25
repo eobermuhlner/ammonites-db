@@ -15,10 +15,13 @@ class UserRepository(private val dsl: DSLContext) {
             .fetchOne(0, Int::class.java) == 0
     }
 
-    fun saveUser(username: String, password: String, enabled: Boolean): Long? {
+    fun saveUser(username: String, password: String, email: String, firstName: String?, lastName: String?, enabled: Boolean): Long? {
         return dsl.insertInto(USERS)
             .set(USERS.USERNAME, username)
             .set(USERS.PASSWORD, password)
+            .set(USERS.EMAIL, email)
+            .set(USERS.FIRST_NAME, firstName)
+            .set(USERS.LAST_NAME, lastName)
             .set(USERS.ENABLED, enabled)
             .returning(USERS.ID)
             .fetchOne()
@@ -53,6 +56,9 @@ class UserRepository(private val dsl: DSLContext) {
     fun updateUserWithoutPassword(user: Users) {
         dsl.update(USERS)
             .set(USERS.USERNAME, user.username)
+            .set(USERS.EMAIL, user.email)
+            .set(USERS.FIRST_NAME, user.firstName)
+            .set(USERS.LAST_NAME, user.lastName)
             .set(USERS.ENABLED, user.enabled)
             .where(USERS.ID.eq(user.id))
             .execute()

@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -34,7 +33,14 @@ class UserRestController @Autowired constructor(
         if (user.id != null) {
             throw IllegalArgumentException("Not allowed to create with explicit id")
         }
-        userService.registerUserWithRoleNames(user.username, user.password, listOf("USER"))
+        userService.registerUserWithRoleNames(
+            user.username,
+            user.password,
+            user.email,
+            user.firstName,
+            user.lastName,
+            listOf("USER")
+        )
         return ResponseEntity(user.toDTO(), HttpStatus.CREATED)
     }
 
@@ -60,6 +66,9 @@ class UserRestController @Autowired constructor(
         return UserDTO(
             id = this.user.id,
             username = this.user.username,
+            email = this.user.email,
+            firstName = this.user.firstName,
+            lastName = this.user.lastName,
             enabled = this.user.enabled!!,
             roles = this.roles
         )
@@ -122,7 +131,15 @@ class UserRestController @Autowired constructor(
     }
 
     private fun Users.toDTO(): UserDTO {
-        return UserDTO(id = this.id, username = this.username, enabled = this.enabled!!, roles = Collections.emptyList())
+        return UserDTO(
+            id = this.id,
+            username = this.username,
+            email = this.email,
+            firstName = this.firstName,
+            lastName = this.lastName,
+            enabled = this.enabled!!,
+            roles = Collections.emptyList()
+        )
     }
 
     data class PasswordRequest @JvmOverloads constructor(val password: String = "")
