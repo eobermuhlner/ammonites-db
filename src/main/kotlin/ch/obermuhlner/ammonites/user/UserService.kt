@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val roleRepository: RoleRepository,
     private val passwordEncoder: PasswordEncoder,
     @Value("\${admin.username}") private val adminUsername: String,
     @Value("\${admin.password}") private val adminPassword: String
@@ -20,11 +21,20 @@ class UserService(
     }
 
     @Transactional
-    fun registerUser(username: String, password: String) {
+    fun registerUserWithRoles(username: String, password: String, roles: List<Long>) {
         if (!isUsernameAvailable(username)) {
             throw IllegalArgumentException("Username already taken")
         }
-        userRepository.saveUser(username, passwordEncoder.encode(password), true)
+        val userId = userRepository.saveUser(username, passwordEncoder.encode(password), true)
+        if (userId != null) {
+            userRepository.addRolesToUser(userId, roles)
+        }
+    }
+
+    @Transactional
+    fun registerUserWithRoleNames(username: String, password: String, roles: List<String>) {
+        val roleIds = roles.map { roleName -> roleRepository.findByName(roleName)!!.id }
+        registerUserWithRoles(username, password, roleIds)
     }
 
     @Transactional(readOnly = true)
@@ -32,9 +42,18 @@ class UserService(
         return userRepository.findAllUsers()
     }
 
+    fun findAllUsersWithRoles(): List<UserRepository.UsersWithRoles> {
+        return userRepository.findAllUsersWithRoles()
+    }
+
     @Transactional(readOnly = true)
     fun findUserById(id: Long): Users? {
         return userRepository.findUserById(id)
+    }
+
+    @Transactional(readOnly = true)
+    fun findUserWithRolesById(id: Long): UserRepository.UsersWithRoles? {
+        return userRepository.findUserWithRolesById(id)
     }
 
     @Transactional
@@ -52,10 +71,22 @@ class UserService(
         return userRepository.deleteUserById(id)
     }
 
+    @Transactional
+    fun addRoleToUser(userId: Long, roleName: String) {
+        val role = roleRepository.findByName(roleName) ?: throw IllegalArgumentException("Role not found: $roleName")
+        userRepository.addRoleToUser(userId, role.id!!)
+    }
+
+    @Transactional
+    fun removeRoleFromUser(userId: Long, roleName: String) {
+        val role = roleRepository.findByName(roleName) ?: throw IllegalArgumentException("Role not found: $roleName")
+        userRepository.removeRoleFromUser(userId, role.id!!)
+    }
+
     @PostConstruct
     private fun createDefaultAdminUserIfNeeded() {
         if (userRepository.isUsernameAvailable(adminUsername)) {
-            registerUser(adminUsername, adminPassword)
+            registerUserWithRoleNames(adminUsername, adminPassword, listOf("ADMIN"))
         }
     }
 }

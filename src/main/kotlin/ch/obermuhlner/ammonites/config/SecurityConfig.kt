@@ -12,9 +12,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -28,6 +31,7 @@ import java.io.IOException
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
     private val userDetailsService: UserDetailsService
 ) {
@@ -98,8 +102,8 @@ class JwtAuthenticationFilter : OncePerRequestFilter() {
             val token = authorizationHeader.substring(7)
             if (JwtUtil.validateToken(token)) {
                 val username = JwtUtil.getUsernameFromToken(token)
-                val roles = JwtUtil.getRolesFromToken(token)
-                val authentication = UsernamePasswordAuthenticationToken(username, null, emptyList())
+                val roles = JwtUtil.getRolesFromToken(token).map { SimpleGrantedAuthority(it)}
+                val authentication = UsernamePasswordAuthenticationToken(username, null, roles)
                 SecurityContextHolder.getContext().authentication = authentication
             }
         }

@@ -23,7 +23,8 @@ class CustomUserDetailsService(private val dsl: DSLContext) : UserDetailsService
             .join(USER_ROLES).on(USER_ROLES.ROLE_ID.eq(ROLES.ID))
             .where(USER_ROLES.USER_ID.eq(userRecord.id))
             .fetch()
-            .map { SimpleGrantedAuthority(it.value1()) }
+//            .map { SimpleGrantedAuthority(it.value1()) }
+            .map { SimpleGrantedAuthority("ROLE_${it.value1()}") }
 
         return User(
             userRecord.username,
