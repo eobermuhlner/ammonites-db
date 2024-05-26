@@ -6,15 +6,13 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/api/users")
 class UserRestController @Autowired constructor(
-    private val userService: UserService,
-    private val passwordEncoder: PasswordEncoder
+    private val userService: UserService
 ) {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
@@ -22,8 +20,6 @@ class UserRestController @Autowired constructor(
         if (user.id != null) {
             throw IllegalArgumentException("Not allowed to create with explicit id")
         }
-        val encodedPassword = passwordEncoder.encode(user.password)
-        user.password = encodedPassword
         userService.updateUser(user)
         return ResponseEntity(user.toDTO(), HttpStatus.CREATED)
     }
@@ -62,27 +58,12 @@ class UserRestController @Autowired constructor(
         }
     }
 
-    private fun UserRepository.UsersWithRoles.toDTO(): UserDTO {
-        return UserDTO(
-            id = this.user.id,
-            username = this.user.username,
-            email = this.user.email,
-            firstName = this.user.firstName,
-            lastName = this.user.lastName,
-            enabled = this.user.enabled!!,
-            roles = this.roles
-        )
-    }
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     fun updateById(@PathVariable id: Long, @RequestBody updatedUser: Users): ResponseEntity<UserDTO?> {
         val user = userService.findUserById(id)
         return if (user != null) {
             updatedUser.id = id
-            if (updatedUser.password != null) {
-                updatedUser.password = passwordEncoder.encode(updatedUser.password)
-            }
             userService.updateUser(updatedUser, false)
             ResponseEntity(updatedUser.toDTO(), HttpStatus.OK)
         } else {
@@ -91,11 +72,14 @@ class UserRestController @Autowired constructor(
     }
 
     @PutMapping("/{id}/password")
-    fun changePassword(@PathVariable id: Long, @RequestBody passwordRequest: PasswordRequest) {
+    fun changePassword(@PathVariable id: Long, @RequestBody passwordRequest: PasswordRequest): ResponseEntity<Unit> {
         val user = userService.findUserById(id)
-        if (user != null) {
-            user.password = passwordEncoder.encode(passwordRequest.password)
+        return if (user != null) {
+            user.password = passwordRequest.password
             userService.updateUser(user, changePassword = true)
+            ResponseEntity(HttpStatus.NO_CONTENT)
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
 
@@ -130,6 +114,46 @@ class UserRestController @Autowired constructor(
         return ResponseEntity.ok(roles)
     }
 
+    @GetMapping("/me")
+    fun findCurrentUser(authentication: Authentication): ResponseEntity<UserDTO?> {
+        val currentUser = userService.findUserByUsername(authentication.name)
+        return if (currentUser != null) {
+            ResponseEntity(currentUser.toDTO(), HttpStatus.OK)
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
+
+    @PutMapping("/me")
+    fun updateCurrentUser(
+        authentication: Authentication,
+        @RequestBody updatedUser: Users
+    ): ResponseEntity<UserDTO?> {
+        val currentUser = userService.findUserByUsername(authentication.name)
+        return if (currentUser != null) {
+            updatedUser.id = currentUser.id
+            userService.updateUser(updatedUser, false)
+            ResponseEntity(updatedUser.toDTO(), HttpStatus.OK)
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
+
+    @PutMapping("/me/password")
+    fun changeCurrentUserPassword(
+        authentication: Authentication,
+        @RequestBody passwordRequest: PasswordRequest
+    ): ResponseEntity<Unit> {
+        val currentUser = userService.findUserByUsername(authentication.name)
+        return if (currentUser != null) {
+            currentUser.password = passwordRequest.password
+            userService.updateUser(currentUser, changePassword = true)
+            ResponseEntity(HttpStatus.NO_CONTENT)
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
+
     private fun Users.toDTO(): UserDTO {
         return UserDTO(
             id = this.id,
@@ -143,4 +167,16 @@ class UserRestController @Autowired constructor(
     }
 
     data class PasswordRequest @JvmOverloads constructor(val password: String = "")
+
+    private fun UserRepository.UsersWithRoles.toDTO(): UserDTO {
+        return UserDTO(
+            id = this.user.id,
+            username = this.user.username,
+            email = this.user.email,
+            firstName = this.user.firstName,
+            lastName = this.user.lastName,
+            enabled = this.user.enabled!!,
+            roles = this.roles
+        )
+    }
 }

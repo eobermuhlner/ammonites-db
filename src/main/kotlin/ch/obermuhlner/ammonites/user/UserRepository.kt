@@ -53,6 +53,12 @@ class UserRepository(private val dsl: DSLContext) {
             .fetchOneInto(Users::class.java)
     }
 
+    fun findUserByUsername(username: String): Users? {
+        return dsl.selectFrom(USERS)
+            .where(USERS.USERNAME.eq(username))
+            .fetchOneInto(Users::class.java)
+    }
+
     fun updateUserWithoutPassword(user: Users) {
         dsl.update(USERS)
             .set(USERS.USERNAME, user.username)

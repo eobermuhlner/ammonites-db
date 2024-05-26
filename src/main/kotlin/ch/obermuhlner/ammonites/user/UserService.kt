@@ -56,6 +56,11 @@ class UserService(
         return userRepository.findUserWithRolesById(id)
     }
 
+    @Transactional(readOnly = true)
+    fun findUserByUsername(username: String): Users? {
+        return userRepository.findUserByUsername(username)
+    }
+
     @Transactional
     fun updateUser(user: Users, changePassword: Boolean = false) {
         if (changePassword && user.password != null && user.password.isNotEmpty()) {
