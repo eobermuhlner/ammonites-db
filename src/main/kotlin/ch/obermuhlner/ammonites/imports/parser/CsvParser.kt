@@ -8,10 +8,10 @@ import java.nio.charset.StandardCharsets
 class CsvParser : ImportParser {
     override fun parse(
         inputStream: InputStream,
+        log: StringBuilder,
         processHeader: (row: List<String>, log: StringBuilder) -> Unit,
         processRow: (row: List<String>, log: StringBuilder) -> Unit
     ): String {
-        val log = StringBuilder()
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, StandardCharsets.UTF_8))
         var rowCount = 0
         bufferedReader.useLines { lines ->

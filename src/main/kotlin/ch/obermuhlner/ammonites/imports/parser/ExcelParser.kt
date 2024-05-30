@@ -6,10 +6,10 @@ import java.io.InputStream
 class ExcelParser : ImportParser {
     override fun parse(
         inputStream: InputStream,
+        log: StringBuilder,
         processHeader: (row: List<String>, log: StringBuilder) -> Unit,
         processRow: (row: List<String>, log: StringBuilder) -> Unit
     ): String {
-        val log = StringBuilder()
         val workbook = WorkbookFactory.create(inputStream)
         val sheet = workbook.getSheetAt(0)
         sheet.forEach { row ->
