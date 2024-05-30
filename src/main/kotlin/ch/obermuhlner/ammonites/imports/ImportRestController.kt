@@ -2,6 +2,7 @@ package ch.obermuhlner.ammonites.imports
 
 import ch.obermuhlner.ammonites.ammonite.AmmoniteService
 import ch.obermuhlner.ammonites.image.ImageService
+import ch.obermuhlner.ammonites.imports.parser.ImportParser
 import ch.obermuhlner.ammonites.imports.parser.ImportParserFactory
 import ch.obermuhlner.ammonites.jooq.tables.pojos.Ammonite
 import ch.obermuhlner.ammonites.jooq.tables.pojos.Image
@@ -15,7 +16,6 @@ import java.io.File
 import java.net.URLConnection
 import java.util.*
 
-
 @RestController
 @RequestMapping("/api/import")
 class ImportRestController @Autowired constructor(
@@ -23,8 +23,8 @@ class ImportRestController @Autowired constructor(
     private val imageService: ImageService,
     private val measurementService: MeasurementService
 ) {
-    @PostMapping("/ammonites")
-    fun importAmmonites(@RequestParam("file") file: MultipartFile, @RequestParam("images") images: List<MultipartFile>): ResponseEntity<String> {
+    @PostMapping("/file")
+    fun importFile(@RequestParam("file") file: MultipartFile, @RequestParam("images") images: List<MultipartFile>): ResponseEntity<String> {
         if (file.isEmpty) {
             return ResponseEntity.badRequest().body("File is empty")
         }
@@ -33,7 +33,32 @@ class ImportRestController @Autowired constructor(
 
         val parser = ImportParserFactory().getParser(file)
         val result = parser.parse(file.inputStream,
-            { headers, log -> log.append("Headers: $headers\n") },
+            { headers, log ->
+                val importType = getImportType(headers)
+                log.append("Headers: $headers\n")
+                when (importType) {
+                    ImportType.AMMONITES -> log.append(importAmmonites(file, imagesMap, parser))
+                    ImportType.AMMONITE_MEASUREMENTS -> log.append(importMeasurementsForAmmonites(file, imagesMap, parser))
+                    ImportType.UNKNOWN -> log.append("Unknown import type\n")
+                }
+            },
+            { _, _ -> }
+        )
+        return ResponseEntity.ok(result)
+    }
+
+    private fun getImportType(headers: List<String>): ImportType {
+        return when {
+            headers.containsAll(listOf("Subclass", "Family", "Genus", "Species")) -> ImportType.AMMONITES
+            headers.containsAll(listOf("Species", "DiameterSide", "ProportionN")) -> ImportType.AMMONITE_MEASUREMENTS
+            else -> ImportType.UNKNOWN
+        }
+    }
+
+    private fun importAmmonites(file: MultipartFile, imagesMap: Map<String, ByteArray>, parser: ImportParser): String {
+        val log = StringBuilder()
+        parser.parse(file.inputStream,
+            { headers, _ -> log.append("Importing Ammonites with headers: $headers\n") },
             { cells, log ->
                 if (cells.size >= 11) {
                     processAmmoniteRow(
@@ -54,7 +79,7 @@ class ImportRestController @Autowired constructor(
                     log.append("Invalid data format: $cells\n")
                 }
             })
-        return ResponseEntity.ok(result)
+        return log.toString()
     }
 
     private fun processAmmoniteRow(
@@ -85,17 +110,10 @@ class ImportRestController @Autowired constructor(
         }
     }
 
-    @PostMapping("/ammonite/measurements")
-    fun importMeasurementsForAmmonites(@RequestParam("file") file: MultipartFile, @RequestParam("images") images: List<MultipartFile>): ResponseEntity<String> {
-        if (file.isEmpty) {
-            return ResponseEntity.badRequest().body("File is empty")
-        }
-
-        val imagesMap = convertToMap(images)
-
-        val parser = ImportParserFactory().getParser(file)
-        val result = parser.parse(file.inputStream,
-            { headers, log -> log.append("Headers: $headers\n") },
+    private fun importMeasurementsForAmmonites(file: MultipartFile, imagesMap: Map<String, ByteArray>, parser: ImportParser): String {
+        val log = StringBuilder()
+        parser.parse(file.inputStream,
+            { headers, _ -> log.append("Importing Ammonite Measurements with headers: $headers\n") },
             { cells, log ->
                 if (cells.size >= 13) {
                     processAmmoniteMeasurementRow(
@@ -118,7 +136,7 @@ class ImportRestController @Autowired constructor(
                     log.append("Invalid data format: $cells\n")
                 }
             })
-        return ResponseEntity.ok(result)
+        return log.toString()
     }
 
     private fun processAmmoniteMeasurementRow(
@@ -235,4 +253,11 @@ class ImportRestController @Autowired constructor(
 
         return imageMap
     }
+
+    enum class ImportType {
+        AMMONITES,
+        AMMONITE_MEASUREMENTS,
+        UNKNOWN
+    }
 }
+

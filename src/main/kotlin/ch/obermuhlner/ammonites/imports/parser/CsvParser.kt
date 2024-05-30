@@ -17,7 +17,6 @@ class CsvParser : ImportParser {
         bufferedReader.useLines { lines ->
             lines.filter { line -> !line.startsWith("#") }
                 .forEach { line ->
-                    println("LINE: $line")
                     val parts = parseCsvLine(line)
                     if (rowCount == 0) {
                         processHeader(parts, log)

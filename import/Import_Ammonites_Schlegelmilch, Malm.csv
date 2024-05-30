@@ -1,4 +1,4 @@
-Subclass, Family, Subfamily, Genus, Subgenus, Species, Description, Comment, Strata, Overwrite image, Image path
+Subclass, Family, Subfamily, Genus, Subgenus, Species, Description, Comment, Strata, OverwriteImage, ImageFilePath
 Perisphinctaceae, Perisphinctidae, Perisphinctinae, Perisphinctes, Alligaticeras, Alligaticeras consociatum, , "Schlegelmilch, Malm, Image: 16.23", "ox 1 a, ox 1 b", false, Schlegelmilch_Malm_16_23.jpg
 Perisphinctaceae, Perisphinctidae, Perisphinctinae, Perisphinctes, Alligaticeras, Alligaticeras mairei, , "Schlegelmilch, Malm, Image: 17.1", "ox 1 a, ox 1 b", false, Schlegelmilch_Malm_17_1.jpg
 Perisphinctaceae, Perisphinctidae, Perisphinctinae, Perisphinctes, Properisphinctes, Properisphinctes bernensis, , "Schlegelmilch, Malm, Image: 17.2", "ox 1 b", false, Schlegelmilch_Malm_17_2.jpg

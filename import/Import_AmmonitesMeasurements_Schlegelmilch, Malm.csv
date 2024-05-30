@@ -1,4 +1,4 @@
-taxonomySpecies, diameterSide, diameterCross, proportionN, proportionH, proportionB, proportionQ, countPrimaryRibs, countSecondaryRibs, ribDivisionRatio, comment, overwriteImage, imageFilePath
+Species, DiameterSide, DiameterCross, ProportionN, ProportionH, ProportionB, ProportionQ, CountPrimaryRibs, CountSecondaryRibs, RibDivisionRatio, Comment, OverwriteImage, ImageFilePath
 Alligaticeras consociatum, 10.8, , 44, 31, , 1.07, 57, , , Schlegelmilch, false,
 Alligaticeras consociatum, 9.3, , 41, 33, , 1.07, 57, , , Schlegelmilch, false,
 Alligaticeras mairei, 2, , 40, 34, , 1.1, 60, , , Schlegelmilch, false,
