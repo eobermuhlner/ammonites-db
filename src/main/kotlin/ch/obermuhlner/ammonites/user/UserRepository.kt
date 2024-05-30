@@ -78,10 +78,19 @@ class UserRepository(private val dsl: DSLContext) {
     }
 
     fun deleteUserById(id: Long): Boolean {
-        val deleted = dsl.deleteFrom(USERS)
+        val userRolesDeleted = dsl.deleteFrom(USER_ROLES)
+            .where(USER_ROLES.USER_ID.eq(id))
+            .execute()
+
+        val tokensDeleted = dsl.deleteFrom(CONFIRMATION_TOKENS)
+            .where(CONFIRMATION_TOKENS.USER_ID.eq(id))
+            .execute()
+
+        val userDeleted = dsl.deleteFrom(USERS)
             .where(USERS.ID.eq(id))
             .execute()
-        return deleted > 0
+
+        return userDeleted > 0
     }
 
     fun addRoleToUser(userId: Long, roleId: Long) {

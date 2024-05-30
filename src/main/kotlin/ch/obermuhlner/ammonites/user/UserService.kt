@@ -1,19 +1,27 @@
 package ch.obermuhlner.ammonites.user
 
+import ch.obermuhlner.ammonites.email.EmailService
+import ch.obermuhlner.ammonites.jooq.tables.pojos.ConfirmationTokens
 import ch.obermuhlner.ammonites.jooq.tables.pojos.Users
 import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.util.*
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
     private val roleRepository: RoleRepository,
     private val passwordEncoder: PasswordEncoder,
+    private val emailService: EmailService,
+    private val confirmationTokenRepository: ConfirmationTokenRepository,
     @Value("\${admin.username}") private val adminUsername: String,
-    @Value("\${admin.password}") private val adminPassword: String
+    @Value("\${admin.password}") private val adminPassword: String,
+    @Value("\${app.base-url}") private val baseUrl: String,
+    @Value("\${app.email-confirmation.enable}") private val enableEmailConfirmation: Boolean
 ) {
     @Transactional(readOnly = true)
     fun isUsernameAvailable(username: String): Boolean {
@@ -32,9 +40,59 @@ class UserService(
     }
 
     @Transactional
-    fun registerUserWithRoleNames(username: String, password: String, email: String, firstName: String?, lastName: String?, roles: List<String>) {
+    fun registerUserWithRoleNames(
+        username: String,
+        password: String,
+        email: String,
+        firstName: String?,
+        lastName: String?,
+        roles: List<String>
+    ) {
+        if (!isUsernameAvailable(username)) {
+            throw IllegalArgumentException("Username already taken")
+        }
+        val encodedPassword = passwordEncoder.encode(password)
+        val enabled = !enableEmailConfirmation
+        val userId = userRepository.saveUser(username, encodedPassword, email, firstName, lastName, enabled)
         val roleIds = roles.map { roleName -> roleRepository.findByName(roleName)!!.id }
-        registerUserWithRoles(username, password, email, firstName, lastName, roleIds)
+        if (userId != null) {
+            userRepository.addRolesToUser(userId, roleIds)
+            if (enableEmailConfirmation) {
+                sendConfirmationEmail(email, userId)
+            }
+        }
+    }
+
+    private fun sendConfirmationEmail(email: String, userId: Long) {
+        val token = UUID.randomUUID().toString()
+        val expiryDate = LocalDateTime.now().plusDays(1)
+        confirmationTokenRepository.saveToken(ConfirmationTokens(
+            null,
+            token,
+            userId,
+            expiryDate
+        ))
+        val confirmationUrl = "$baseUrl/users/confirm?token=$token"
+        val message = "Please confirm your email by clicking on the following link: $confirmationUrl"
+        emailService.sendEmail(email, "Email Confirmation", message)
+    }
+
+    @Transactional
+    fun confirmUser(token: String): Boolean {
+        val confirmationToken = confirmationTokenRepository.findByToken(token)
+        return if (confirmationToken != null && confirmationToken.userId != null) {
+            val user = userRepository.findUserById(confirmationToken.userId)
+            if (user != null) {
+                user.enabled = true
+                userRepository.updateUserWithoutPassword(user)
+                confirmationTokenRepository.deleteToken(confirmationToken.id)
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 
     @Transactional(readOnly = true)
@@ -71,7 +129,7 @@ class UserService(
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     fun deleteUserById(id: Long): Boolean {
         return userRepository.deleteUserById(id)
     }

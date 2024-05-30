@@ -154,6 +154,15 @@ class UserRestController @Autowired constructor(
         }
     }
 
+    @GetMapping("/confirm")
+    fun confirmUser(@RequestParam token: String): ResponseEntity<Unit> {
+        return if (userService.confirmUser(token)) {
+            ResponseEntity(HttpStatus.OK)
+        } else {
+            ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+    }
+
     private fun Users.toDTO(): UserDTO {
         return UserDTO(
             id = this.id,

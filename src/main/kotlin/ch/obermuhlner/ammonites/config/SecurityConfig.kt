@@ -49,6 +49,7 @@ class SecurityConfig(
                     .requestMatchers("/csrf-token").permitAll()
                     .requestMatchers("/actuator/**").permitAll()
                     .requestMatchers("/api/users/new").permitAll()
+                    .requestMatchers("/api/users/confirm").permitAll()
                     .requestMatchers("/api/translations").permitAll()
                     .requestMatchers("/api/translations/**").permitAll()
                     .anyRequest().authenticated()
