@@ -104,6 +104,12 @@ class UserRepository(private val dsl: DSLContext) {
             .execute()
     }
 
+    fun deleteRolesByUserId(userId: Long) {
+        dsl.deleteFrom(USER_ROLES)
+            .where(USER_ROLES.USER_ID.eq(userId))
+            .execute()
+    }
+
     fun findUserWithRolesById(id: Long): UsersWithRoles? {
         val userRecord = dsl.selectFrom(USERS)
             .where(USERS.ID.eq(id))

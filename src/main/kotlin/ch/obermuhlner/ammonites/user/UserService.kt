@@ -71,8 +71,9 @@ class UserService(
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     fun deleteUserById(id: Long): Boolean {
+        userRepository.deleteRolesByUserId(id)
         return userRepository.deleteUserById(id)
     }
 
