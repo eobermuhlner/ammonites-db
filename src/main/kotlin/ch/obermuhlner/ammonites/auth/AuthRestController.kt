@@ -14,7 +14,7 @@ data class LoginRequest(val username: String, val password: String)
 data class LoginResponse(val message: String, val token: String?)
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 class AuthRestController(private val authenticationManager: AuthenticationManager) {
 
     @GetMapping("/csrf-token")

@@ -45,9 +45,9 @@ class SecurityConfig(
             }
             .authorizeHttpRequests { authz ->
                 authz
-                    .requestMatchers("/login").permitAll()
-                    .requestMatchers("/csrf-token").permitAll()
                     .requestMatchers("/actuator/**").permitAll()
+                    .requestMatchers("/api/login").permitAll()
+                    .requestMatchers("/api/csrf-token").permitAll()
                     .requestMatchers("/api/users/new").permitAll()
                     .requestMatchers("/api/translations").permitAll()
                     .requestMatchers("/api/translations/**").permitAll()
